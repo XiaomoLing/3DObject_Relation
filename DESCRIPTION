@@ -1,4 +1,4 @@
-Package: Object.3D.Relation
+Package: Detect3DRelation
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
@@ -14,9 +14,8 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
-Imports:
-	intervals,
-	dplyr,
-	plyr,
-	tibble
-	
+imports:
+    dplyr,
+    tibble,
+    intervals,
+    plyr
