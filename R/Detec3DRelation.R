@@ -30,9 +30,9 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   ### Result List of X included
   list.X <- intervals::interval_included(From.X, To.X)
-  df.list.X <- plyr::ldply(list.X, as.data.frame)
-  colnames(df.list.X) <- c("WithinRNO","tabletoRNO")
-
+  names(list.X) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.X <- data.frame(WithinRNO = rep(names(list.X), sapply(list.X, length)),
+                          tabletoRNO = unlist(list.X))
   df.list.X <- tibble::as_tibble(df.list.X)
 
   ## Y-axis
@@ -49,11 +49,12 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   ### Result List of Y included
   list.Y <- intervals::interval_included(From.Y, To.Y)
-  df.list.Y <- plyr::ldply(list.Y, as.data.frame)
-  colnames(df.list.Y) <- c("WithinRNO","tabletoRNO")
+  names(list.Y) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.Y <- data.frame(WithinRNO = rep(names(list.Y), sapply(list.Y, length)),
+                          tabletoRNO = unlist(list.Y))
 
   df.list.Y <- tibble::as_tibble(df.list.Y)
-
+  
   ## Z-axis
   ### From is Check Against List
   tablefrom.Z <- as.matrix(dplyr::select(tablefrom,MIN.Z,MAX.Z))
@@ -66,11 +67,11 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   ### Result List of Z included
   list.Z <- intervals::interval_included(From.Z, To.Z)
-  df.list.Z <- plyr::ldply(list.Z, as.data.frame)
-  colnames(df.list.Z) <- c("WithinRNO","tabletoRNO")
-
+  names(list.Z) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.Z <- data.frame(WithinRNO = rep(names(list.Z), sapply(list.Z, length)),
+                          tabletoRNO = unlist(list.Z))
   df.list.Z <- tibble::as_tibble(df.list.Z)
-
+  
   ## Bind the all result table of XYZ, then filter for count = 3
   df.list.XYZ <- dplyr::bind_rows(df.list.X,df.list.Y,df.list.Z)
   df.list.XYZ <- dplyr::group_by(df.list.XYZ, tabletoRNO, WithinRNO)
@@ -90,8 +91,10 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   ### List of X overlapped
   list.rest.X <- intervals::interval_overlap(From.X, To.rest.X)
-  df.list.rest.X <- plyr::ldply(list.rest.X, as.data.frame)
-  colnames(df.list.rest.X) <- c("OverlapRNO","tabletoRRNO")
+  
+  names(list.rest.X) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.rest.X <- data.frame(OverlapRNO = rep(names(list.rest.X), sapply(list.rest.X, length)),
+                               tabletoRRNO = unlist(list.rest.X))
 
   df.list.rest.X <- tibble::as_tibble(df.list.rest.X)
 
@@ -102,9 +105,11 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   #### List of Y overlapped
   list.rest.Y <- intervals::interval_overlap(From.Y, To.rest.Y)
-  df.list.rest.Y <- plyr::ldply(list.rest.Y, as.data.frame)
-  colnames(df.list.rest.Y) <- c("OverlapRNO","tabletoRRNO")
 
+  names(list.rest.Y) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.rest.Y <- data.frame(OverlapRNO = rep(names(list.rest.Y), sapply(list.rest.Y, length)),
+                               tabletoRRNO = unlist(list.rest.Y))
+  
   df.list.rest.Y <- tibble::as_tibble(df.list.rest.Y)
 
   ## Z-axis
@@ -114,16 +119,17 @@ detecte3Dr <- function (tablefrom, tableto, closedfrom, closedto ) {
 
   ### List of Z overlapped
   list.rest.Z <- intervals::interval_overlap(From.Z, To.rest.Z)
-  df.list.rest.Z <- plyr::ldply(list.rest.Z, as.data.frame)
-  colnames(df.list.rest.Z) <- c("OverlapRNO","tabletoRRNO")
-
+  names(list.rest.Z) <- c(seq.int(nrow(tablefrom.X)))
+  df.list.rest.Z <- data.frame(OverlapRNO = rep(names(list.rest.Z), sapply(list.rest.Z, length)),
+                               tabletoRRNO = unlist(list.rest.Z))
+  
   df.list.rest.Z <- tibble::as_tibble(df.list.rest.Z)
 
   ### Bind the rows of the result table of XYZ, then filter for count = 3
   df.list.rest.XYZ <-  dplyr::bind_rows(df.list.rest.X,df.list.rest.Y,df.list.rest.Z)
 
   df.list.rest.XYZ <- dplyr::group_by(df.list.rest.XYZ, tabletoRRNO, OverlapRNO)
-  df.list.rest.XYZ <- dplyr::summarise(df.list.rest.XYZ, n=n())
+  df.list.rest.XYZ <- dplyr::summarise(df.list.rest.XYZ, n = dplyr::n())
   Overlap <- dplyr::filter(df.list.rest.XYZ, n >2)
 
   ## Combine overlap and included results
